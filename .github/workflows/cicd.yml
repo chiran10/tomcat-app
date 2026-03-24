@@ -50,15 +50,15 @@ jobs:
           echo "POD_NAME=$POD_NAME" >> $GITHUB_ENV
 
       # Step 9: Create users table in PostgreSQL
-      - name: Create users table
-        run: |
-          kubectl exec $POD_NAME -n enterprise-app -- \
-          psql -U postgres -d mydb -c "
-          CREATE TABLE IF NOT EXISTS users (
-              id SERIAL PRIMARY KEY,
-              name VARCHAR(100) NOT NULL,
-              age INT CHECK (age >= 0)
-          );"
+      #- name: Create users table
+      #  run: |
+      #    kubectl exec $POD_NAME -n enterprise-app -- \
+      #    psql -U postgres -d mydb -c "
+      #    CREATE TABLE IF NOT EXISTS users (
+      #        id SERIAL PRIMARY KEY,
+      #        name VARCHAR(100) NOT NULL,
+      #        age INT CHECK (age >= 0)
+      #    );"
 
       # Step 10: Verify table
       - name: Verify table
