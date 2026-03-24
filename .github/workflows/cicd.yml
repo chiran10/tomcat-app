@@ -11,7 +11,7 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      # Step 1: Checkout code
+      # Step 1: Checkout codes
       - name: Checkout code
         uses: actions/checkout@v3
 
