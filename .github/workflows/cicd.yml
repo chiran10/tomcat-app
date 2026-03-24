@@ -11,11 +11,11 @@ on:
         description: 'Version to deploy'
         required: false
 
-on:
-  push:
-    branches:
-      - main
-      - feature/cicd-pipeline
+#on:
+#  push:
+#    branches:
+#      - main
+#      - feature/cicd-pipeline
 
 jobs:
   build-and-deploy:
