@@ -11,7 +11,7 @@ jobs:
     runs-on: self-hosted   # ✅ Run on your VM
 
     steps:
-      # Step 1: Checkout code1
+      # Step 1: Checkout code2
       - name: Checkout code
         uses: actions/checkout@v3
 
