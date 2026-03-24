@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-helloworld
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tomcat-helloworld
+  template:
+    metadata:
+      labels:
+        app: tomcat-helloworld
+    spec:
+      containers:
+      - name: tomcat
+        image: tomcat-helloworld:local
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080

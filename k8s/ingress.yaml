@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: enterprise-ingress
+  namespace: enterprise-app
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /app(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: tomcat-app
+            port:
+              number: 8080
+      - path: /helloworld(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: tomcat-helloworld
+            port:
+              number: 8080
