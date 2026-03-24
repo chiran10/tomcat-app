@@ -102,3 +102,8 @@ jobs:
       - name: Apply Service
         run: kubectl apply -f k8s/service_helloworld.yaml -n enterprise-app
 
+
+      # Step 13: Apply ingress
+      - name: Apply ingress
+        run: kubectl apply -f k8s/ingress.yaml -n enterprise-app
+
