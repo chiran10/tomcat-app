@@ -8,8 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: enterprise.local
-      http:
+    -  http:
         paths:
           # Main app
           - path: /app
