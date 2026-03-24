@@ -13,7 +13,6 @@ spec:
       labels:
         app: tomcat-app
     spec:
-      restartPolicy: Never
       containers:
       - name: tomcat-container
         image: tomcat-app:latest
