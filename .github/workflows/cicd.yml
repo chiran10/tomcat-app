@@ -77,13 +77,6 @@ jobs:
           kubectl exec $POD_NAME -n enterprise-app -- \
           psql -U postgres -d mydb -c "\dt"
 
-  deploy-tomcat:
-    runs-on: self-hosted
-    needs: build-and-deploy   # wait for previous job
-    environment: production
-
-    steps:
-
       # Step 11: Apply ConfigMap
       - name: Apply ConfigMap
         run: kubectl apply -f k8s/configmap.yaml -n enterprise-app
