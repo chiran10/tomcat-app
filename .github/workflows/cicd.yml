@@ -1,6 +1,17 @@
 name: CI/CD Pipeline
 
 on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+      deploy_version:
+        description: 'Version to deploy'
+        required: false
+
+on:
   push:
     branches:
       - main
