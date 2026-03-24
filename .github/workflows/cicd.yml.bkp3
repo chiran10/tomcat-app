@@ -1,0 +1,64 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - feature/cicd-pipeline
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted   # ✅ Run on your VM
+
+    steps:
+      # Step 1: Checkout code2
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Ensure Docker is available
+      - name: Check Docker
+        run: docker version
+
+      # Step 3: Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t tomcat-app:latest .
+
+      # Step 4: Ensure Minikube is running
+      - name: Start Minikube if not running
+        run: |
+          minikube status || minikube start
+
+      # Step 5: Set kubectl context to Minikube
+      - name: Set kubectl context
+        run: |
+          kubectl config use-context minikube
+
+      # Step 6: Verify cluster access
+      - name: Verify Kubernetes cluster
+        run: kubectl get nodes
+
+      # Step 7: Create namespace
+      - name: Create namespace
+        run: kubectl apply -f k8s/namespace.yaml
+
+      # Step 8: Deploy PostgreSQL
+      - name: Deploy PostgreSQL
+        run: |
+          kubectl apply -f k8s/postgres-deployment.yaml -n enterprise-app
+          kubectl apply -f k8s/postgres-service.yaml -n enterprise-app
+          kubectl rollout status deployment/postgres -n enterprise-app
+
+      # Step 9: Apply ConfigMap
+      - name: Apply ConfigMap
+        run: kubectl apply -f k8s/configmap.yaml -n enterprise-app
+
+      # Step 10: Deploy Tomcat
+      - name: Deploy Tomcat
+        run: |
+          kubectl apply -f k8s/deployment.yaml -n enterprise-app
+          kubectl rollout status deployment/tomcat-app -n enterprise-app
+
+      # Step 11: Apply Service
+      - name: Apply Service
+        run: kubectl apply -f k8s/service.yaml -n enterprise-app

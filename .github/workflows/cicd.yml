@@ -8,57 +8,70 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted   # ✅ Run on your VM
+    runs-on: self-hosted
 
     steps:
-      # Step 1: Checkout code2
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Ensure Docker is available
-      - name: Check Docker
-        run: docker version
-
-      # Step 3: Build Docker image
+      # Step 2: Build Docker image
       - name: Build Docker image
-        run: |
-          docker build -t tomcat-app:latest .
+        run: docker build -t tomcat-app:latest .
 
-      # Step 4: Ensure Minikube is running
+      # Step 3: Ensure Minikube is running
       - name: Start Minikube if not running
-        run: |
-          minikube status || minikube start
+        run: minikube status || minikube start
 
-      # Step 5: Set kubectl context to Minikube
+      # Step 4: Set kubectl context
       - name: Set kubectl context
-        run: |
-          kubectl config use-context minikube
+        run: kubectl config use-context minikube
 
-      # Step 6: Verify cluster access
-      - name: Verify Kubernetes cluster
+      # Step 5: Verify cluster
+      - name: Verify cluster
         run: kubectl get nodes
 
-      # Step 7: Create namespace
+      # Step 6: Create namespace
       - name: Create namespace
         run: kubectl apply -f k8s/namespace.yaml
 
-      # Step 8: Deploy PostgreSQL
+      # Step 7: Deploy PostgreSQL
       - name: Deploy PostgreSQL
         run: |
           kubectl apply -f k8s/postgres-deployment.yaml -n enterprise-app
           kubectl apply -f k8s/postgres-service.yaml -n enterprise-app
           kubectl rollout status deployment/postgres -n enterprise-app
 
-      # Step 9: Apply ConfigMap
-      - name: Apply ConfigMap
-        run: kubectl apply -f k8s/configmap.yaml -n enterprise-app
+      # Step 8: Get PostgreSQL Pod Name
+      - name: Get Postgres Pod
+        id: pgpod
+        run: |
+          POD_NAME=$(kubectl get pods -n enterprise-app -l app=postgres -o jsonpath="{.items[0].metadata.name}")
+          echo "POD_NAME=$POD_NAME" >> $GITHUB_ENV
 
-      # Step 10: Deploy Tomcat
+      # Step 9: Create users table in PostgreSQL
+      - name: Create users table
+        run: |
+          kubectl exec $POD_NAME -n enterprise-app -- \
+          psql -U postgres -d mydb -c "
+          CREATE TABLE IF NOT EXISTS users (
+              id SERIAL PRIMARY KEY,
+              name VARCHAR(100) NOT NULL,
+              age INT CHECK (age >= 0)
+          );"
+
+      # Step 10: Verify table
+      - name: Verify table
+        run: |
+          kubectl exec $POD_NAME -n enterprise-app -- \
+          psql -U postgres -d mydb -c "\dt"
+
+      # Step 11: Deploy Tomcat
       - name: Deploy Tomcat
         run: |
           kubectl apply -f k8s/deployment.yaml -n enterprise-app
           kubectl rollout status deployment/tomcat-app -n enterprise-app
 
-      # Step 11: Apply Service
+      # Step 12: Apply Service
       - name: Apply Service
-        run: kubectl apply -f k8s/service.yaml -n enterprise-app
+        run: kubectl apply -f k8s/service.yaml -n enterprise-app`
