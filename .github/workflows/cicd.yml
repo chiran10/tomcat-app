@@ -66,12 +66,16 @@ jobs:
           kubectl exec $POD_NAME -n enterprise-app -- \
           psql -U postgres -d mydb -c "\dt"
 
-      # Step 11: Deploy Tomcat
+      # Step 11: Apply ConfigMap
+      - name: Apply ConfigMap
+        run: kubectl apply -f k8s/configmap.yaml -n enterprise-app
+
+      # Step 12: Deploy Tomcat
       - name: Deploy Tomcat
         run: |
           kubectl apply -f k8s/deployment.yaml -n enterprise-app
           kubectl rollout status deployment/tomcat-app -n enterprise-app
 
-      # Step 12: Apply Service
+      # Step 13: Apply Service
       - name: Apply Service
         run: kubectl apply -f k8s/service.yaml -n enterprise-app
