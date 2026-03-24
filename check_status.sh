@@ -23,3 +23,5 @@ echo
 echo
 echo "=== INGRESS"
 kubectl get ingress -n enterprise-app
+echo
+echo
