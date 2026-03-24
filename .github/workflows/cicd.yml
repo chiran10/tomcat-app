@@ -90,7 +90,7 @@ jobs:
       # Step 12: Deploy Tomcat hello world
       - name: Deploy tomcat-hellowworld
         run: |
-          kubectl apply -f k8s/deployment_helloworld.yaml -n enterprise-app
+          kubectl apply -f k8s/deployment-helloworld.yaml -n enterprise-app
           kubectl rollout status deployment/tomcat-helloworld -n enterprise-app
 
 
@@ -100,7 +100,7 @@ jobs:
 
       # Step 13: Apply Service
       - name: Apply Service
-        run: kubectl apply -f k8s/service_helloworld.yaml -n enterprise-app
+        run: kubectl apply -f k8s/service-helloworld.yaml -n enterprise-app
 
 
       # Step 13: Apply ingress
