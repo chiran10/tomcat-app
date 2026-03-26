@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-app
+  namespace: enterprise-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tomcat-app
+  template:
+    metadata:
+      labels:
+        app: tomcat-app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8081"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        # ✅ Tomcat container
+        - name: tomcat-container
+          image: tomcat-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: app-config
+          env:
+            - name: CATALINA_OPTS
+              value: >
+                -Dcom.sun.management.jmxremote
+                -Dcom.sun.management.jmxremote.port=9999
+                -Dcom.sun.management.jmxremote.rmi.port=9999
+                -Dcom.sun.management.jmxremote.local.only=false
+                -Dcom.sun.management.jmxremote.authenticate=false
+                -Dcom.sun.management.jmxremote.ssl=false
+                -Djava.rmi.server.hostname=127.0.0.1
+
+        # ✅ JMX Exporter sidecar
+        - name: jmx-exporter
+          image: bitnami/jmx-exporter:latest
+          ports:
+            - containerPort: 8081
+          args:
+            - "8081"
+            - "/config/config.yaml"
+          volumeMounts:
+            - name: jmx-config
+              mountPath: /config
+
+      # ✅ Config volume
+      volumes:
+        - name: jmx-config
+          configMap:
+            name: jmx-config

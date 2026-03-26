@@ -14,15 +14,20 @@ spec:
         app: tomcat-app
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
-        prometheus.io/path: "/metrics"   # ✅ correct as annotation
+        prometheus.io/port: "8081"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
       - name: tomcat-container
         image: tomcat-app:latest
         imagePullPolicy: Never   # important for local docker
         ports:
-        - containerPort: 8080
+        - containerPort: 8080  # tomcat http
+        - containerPort: 8081  # JMX metrics
         envFrom:
         - configMapRef:
             name: app-config
+         Add JMX Exporter Java agent
+        env:
+        - name: JAVA_OPTS
+          value: "-javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent.jar=8080:/opt/jmx_exporter/config.yaml"
